@@ -3,35 +3,30 @@ import os
 import sys, getopt
 import glob
 from PIL import Image
-import img2pdf
 
 dirname = "./raw/"
 split = "./split/"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
 
 if sys.argv[1] == "merge":
     pdfMerger = PyPDF2.PdfFileMerger()
     names = []
-    with open("merged.pdf", "wb") as f:
-        imgs = []
-        for fname in os.listdir(dirname):
-            if not (fname.endswith(".jpg") or fname.endswith(".png")):
-                continue
-            path = os.path.join(dirname,fname)
-            if os.path.isdir(path):
-                continue
-            imgs.append(path)
-            names.append(fname[0:-4]+ ".pdf"+"\n")
-        f.write(img2pdf.convert(imgs))
-        '''
-    for filename in os.listdir(os.path.join(os.getcwd(), dirname)):
-        names.append(filename+ "\n")
-        image1 = Image.open(os.path.join(dirname,filename))
-        im1 = image1.convert('RGB')
-        print(filename)
-        pdfMerger.append(im1)
-       # pdfMerger.append(open(os.path.join(path,filename), 'rb'))
-   '''         
-			
+    imgs = []
+    for fname in os.listdir(dirname):
+        print("open: "+ fname)
+        if not (fname.endswith(".jpg") or fname.endswith(".png") or fname.endswith(".JPG") or fname.endswith(".jpeg")):
+            print("file not merged: "+ fname)
+            continue
+        path = os.path.join(dirname,fname)
+        if os.path.isdir(path):
+            continue
+        img= Image.open(os.path.join(script_dir, path))
+        img = img.convert('RGB')
+        imgs.append(img)
+        names.append(fname[0:-4]+ ".pdf"+"\n")
+    imgs[0].save(os.path.join(script_dir,"merged.pdf"),save_all=True,append_images=imgs[1:]) 
+   			
     nameFile = open('filenames.txt', 'w')
     nameFile.writelines(names)
     nameFile.close()
